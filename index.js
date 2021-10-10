@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const auth = require("./routes/auth");
 
 require("dotenv").config();
 
@@ -23,7 +24,7 @@ connection.once("open", () => {
 });
 
 //base URL (authentication)
-app.use("/dokita/api/v1");
+app.use("/dokita/api/v1", auth);
 
 app.listen(port, () => {
   console.log(`listening on ${port}`);
