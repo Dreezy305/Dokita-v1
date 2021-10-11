@@ -101,6 +101,7 @@ function signIn(res, req, next) {
                   success: false,
                   message: "invalid token",
                   error: [{ error: err }],
+                  user: user,
                 });
               } else if (decrypt) {
                 return res.status(200).json({
