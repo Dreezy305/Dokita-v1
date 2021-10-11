@@ -81,7 +81,7 @@ function signIn(res, req, next) {
     } else {
       //compare password
       bcrypt
-        .compare(myPlainTextPassword, user.password)
+        .compare(password, user.password)
         .then((isMatch) => {
           if (!isMatch) {
             return res.status(400).json({
@@ -92,6 +92,26 @@ function signIn(res, req, next) {
           //create accesstoken
           createAccessToken = createAccessToken(user._id, user.email, "15m");
           //verify token
+          jwt.verify(
+            createAccessToken,
+            process.env.TOKEN_SECRET,
+            (err, decrypt) => {
+              if (err) {
+                return res.status(400).json({
+                  success: false,
+                  message: "invalid token",
+                  error: [{ error: err }],
+                });
+              } else if (decrypt) {
+                return res.status(200).json({
+                  success: true,
+                  message: "token verified",
+                  accessToken: createAccessToken,
+                  user: user,
+                });
+              }
+            }
+          );
         })
         .catch((err) => {
           res.status(400).json({
@@ -104,4 +124,4 @@ function signIn(res, req, next) {
   });
 }
 
-module.exports = { signUp };
+module.exports = { signUp, signIn };
