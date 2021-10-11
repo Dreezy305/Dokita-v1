@@ -11,4 +11,13 @@ const createAccessToken = (userId, email, duration) => {
   });
 };
 
+const verifyAccessToken =
+  (createAccesstoken,
+  process.env.TOKEN_SECRET,
+  (err, result) => {
+    if (err) {
+      return res.status(500).json({});
+    }
+  });
+
 module.exports = { createAccessToken };

@@ -5,7 +5,7 @@ const { createAccessToken } = require("../utils/auth");
 
 const saltRounds = 10;
 // Maximum of eight characters and , at least one uppercase letter, one lowercase letter and one number:
-const myPlainTextPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{,8}$";
+const myPlainTextPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$";
 
 function signUp(req, res, next) {
   let {
@@ -68,6 +68,40 @@ function signUp(req, res, next) {
   });
 }
 
-function signIn(res, req, next) {}
+function signIn(res, req, next) {
+  let { email, password } = req.body;
+  //check if email exist
+  User.findOne({ email: email }).then((user) => {
+    //check if user doesn't exist
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "user doesn't exist, kindly register",
+      });
+    } else {
+      //compare password
+      bcrypt
+        .compare(myPlainTextPassword, user.password)
+        .then((isMatch) => {
+          if (!isMatch) {
+            return res.status(400).json({
+              success: false,
+              message: "Incorrect password",
+            });
+          }
+          //create accesstoken
+          createAccessToken = createAccessToken(user._id, user.email, "15m");
+          //verify token
+        })
+        .catch((err) => {
+          res.status(400).json({
+            success: false,
+            message: "Something went wrong",
+            error: [{ error: err }],
+          });
+        });
+    }
+  });
+}
 
 module.exports = { signUp };
