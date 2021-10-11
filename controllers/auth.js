@@ -1,11 +1,11 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-//const { createJWT } = require("../utils/auth");
+const { createAccessToken } = require("../utils/auth");
 
 const saltRounds = 10;
-// Minimum eight characters, at least one uppercase letter, one lowercase letter and one number:
-const myPlainTextPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{6,8}$";
+// Maximum of eight characters and , at least one uppercase letter, one lowercase letter and one number:
+const myPlainTextPassword = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{,8}$";
 
 function signUp(req, res, next) {
   let {
