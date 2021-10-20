@@ -5,7 +5,7 @@ const { createAccessToken } = require("../utils/auth");
 
 const saltRounds = 10;
 // Maximum of eight characters and , at least one uppercase letter, one lowercase letter and one number:
-//const PasswordRegexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$";
+const PasswordRegexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 const EmailRegexp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
@@ -60,7 +60,11 @@ function signUp(req, res) {
     errors.push({ password: "please provide your password" });
   }
 
-  if (!password_confirmation) {
+  if (!PasswordRegexp.test(password)) {
+    errors.push({ password: "invalid password" });
+  }
+
+  if (password_confirmation !== password) {
     errors.push({ password_confirmation: "password doesn't match" });
   }
 
@@ -88,6 +92,7 @@ function signUp(req, res) {
       //  hash password with bcrypt js
       bcrypt
         .genSalt(saltRounds, (err, salt) => {
+          console.log(err, "er1");
           bcrypt.hash(password, salt, (err, hash) => {
             if (err) throw err("password incorrect");
             user.password = hash;
@@ -101,6 +106,7 @@ function signUp(req, res) {
                 });
               })
               .catch((err) => {
+                console.log(err, "er2");
                 return res.status(500).json({
                   success: false,
                   errors: [{ error: err }],
@@ -109,6 +115,7 @@ function signUp(req, res) {
           });
         })
         .catch((err) => {
+          console.log(err, "er3");
           return res.status(500).json({
             success: false,
             message: "something went wrong",
@@ -126,21 +133,21 @@ function signIn(req, res) {
 
   let errors = [];
 
-  //if (!email) {
-  //  errors.push({ email: "please provide your email" });
-  //}
+  if (!email) {
+    errors.push({ email: "please provide your email" });
+  }
 
-  //if (!EmailRegexp.test(email)) {
-  //  errors.push({ email: "invalid" });
-  //}
+  if (!EmailRegexp.test(email)) {
+    errors.push({ email: "invalid" });
+  }
 
-  //if (!password) {
-  //  errors.push({ password: "please provide your password" });
-  //}
+  if (!password) {
+    errors.push({ password: "please provide your password" });
+  }
 
-  //if (errors.length > 0) {
-  //  return res.status(400).json({ errors: errors });
-  //}
+  if (errors.length > 0) {
+    return res.status(400).json({ errors: errors });
+  }
 
   //check if email exist
   User.findOne({ email: email }).then((user) => {
