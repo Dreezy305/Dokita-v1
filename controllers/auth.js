@@ -7,9 +7,9 @@ const saltRounds = 10;
 // Maximum of eight characters and , at least one uppercase letter, one lowercase letter and one number:
 const PasswordRegexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*d)[a-zA-Zd]{8,}$";
 const EmailRegexp =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-function signUp(req, res, next) {
+function signUp(req, res) {
   let {
     firstName,
     lastName,
@@ -29,7 +29,7 @@ function signUp(req, res, next) {
   }
 
   if (!lastName) {
-    return errors.push({ lastName: "please provide your first name" });
+    return errors.push({ lastName: "please provide your last name" });
   }
 
   if (!sex) {
@@ -87,40 +87,41 @@ function signUp(req, res, next) {
       });
       //  hash password with bcrypt js
       bcrypt
-        .genSalt(saltRounds, (error, salt) => {
-          bcrypt.hash(password, salt, (error, hash) => {
-            if (error) throw err("password incorrect ");
+        .genSalt(saltRounds, (err, salt) => {
+          bcrypt.hash(PasswordRegexp, salt, (err, hash) => {
+            if (err) throw err("password incorrect");
             user.password = hash;
             user
               .save()
-              .then((response) =>
-                res.status(200).json({
+              .then((response) => {
+                return res.status(200).json({
                   success: true,
                   message: "account created successfully",
-                  response: response,
-                })
-              )
-              .catch((error) =>
-                res.status(500).json({
+                  result: response,
+                });
+              })
+              .catch((err) => {
+                return res.status(500).json({
                   success: false,
-                  message: "there was an error",
-                  errors: [{ errors: error }],
-                })
-              );
+                  errors: [{ error: err }],
+                });
+              });
           });
         })
-        .catch((error) =>
-          res.status(500).json({
+        .catch((err) => {
+          return res.status(500).json({
             success: false,
             message: "something went wrong",
-            errors: [{ errors: error }],
-          })
-        );
+            errors: [{ error: err }],
+          });
+        });
     }
   });
 }
 
-function signIn(res, req, next) {
+function signIn(req, res) {
+  console.log(req.body, "bb");
+
   let { email, password } = req.body;
 
   let errors = [];
@@ -154,7 +155,7 @@ function signIn(res, req, next) {
       //compare password
       console.log(user.password, "pp");
       bcrypt
-        .compare(password, user.password)
+        .compare(req.body.password, user.password)
         .then((isMatch) => {
           if (!isMatch) {
             return res.status(400).json({
@@ -178,9 +179,8 @@ function signIn(res, req, next) {
               } else if (decoded) {
                 return res.status(200).json({
                   success: true,
-                  message: "token verified",
                   accessToken: createAccessToken,
-                  user: user,
+                  message: user,
                 });
               }
             }
