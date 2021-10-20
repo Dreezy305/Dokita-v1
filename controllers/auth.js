@@ -56,6 +56,18 @@ function signUp(req, res, next) {
     return errors.push({ email: "invalid" });
   }
 
+  if (!password) {
+    return errors.push({ password: "please provide your password" });
+  }
+
+  if (!password_confirmation) {
+    return errors.push({ password_confirmation: "password doesn't match" });
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors: errors });
+  }
+
   //  check if user exists
   User.findOne({ email: email }).then((user) => {
     if (user) {
