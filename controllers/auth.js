@@ -92,7 +92,6 @@ function signUp(req, res) {
       //  hash password with bcrypt js
       bcrypt
         .genSalt(saltRounds, (err, salt) => {
-          console.log(err, "er1");
           bcrypt.hash(password, salt, (err, hash) => {
             if (err) throw err("password incorrect");
             user.password = hash;
@@ -106,7 +105,6 @@ function signUp(req, res) {
                 });
               })
               .catch((err) => {
-                console.log(err, "er2");
                 return res.status(500).json({
                   success: false,
                   errors: [{ error: err }],
@@ -115,7 +113,6 @@ function signUp(req, res) {
           });
         })
         .catch((err) => {
-          console.log(err, "er3");
           return res.status(500).json({
             success: false,
             message: "something went wrong",
@@ -160,8 +157,7 @@ function signIn(req, res) {
       });
     } else {
       //compare password
-      console.log(user.password, "pp");
-      console.log(password, "ppx");
+
       bcrypt
         .compare(password, user.password)
         .then((isMatch) => {
@@ -177,7 +173,6 @@ function signIn(req, res) {
           //verify token
           jwt.verify(accessToken, process.env.TOKEN_SECRET, (err, decoded) => {
             if (err) {
-              console.log(err, "err is here");
               return res.status(400).json({
                 errors: [{ error: err }],
               });
@@ -191,7 +186,6 @@ function signIn(req, res) {
           });
         })
         .catch((err) => {
-          console.log(err);
           res.status(400).json({
             success: false,
             message: "Something went wrong",
@@ -201,5 +195,7 @@ function signIn(req, res) {
     }
   });
 }
+
+function logOut() {}
 
 module.exports = { signUp, signIn };
