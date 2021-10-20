@@ -21,7 +21,10 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log("connected to Dokita"));
+  .then(() => console.log("connected to Dokita"))
+  .catch((err) => {
+    console.log(`there was an error ${err}`);
+  });
 
 //const connection = mongoose.connection;
 //connection.once("open", () => {
