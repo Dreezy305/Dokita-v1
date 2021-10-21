@@ -73,6 +73,54 @@ const getDoctors = async (req, res) => {
   }
 };
 
+//get paginated doctors from end point
+const paginateDoctors = async (req, res) => {
+  let { page, limit } = req.query;
+  page = parseInt(req.query.page);
+
+  if (page < 0 || page == 0) {
+    res.status(400).json({
+      success: false,
+      message: `invalid page number ${page}`,
+    });
+  }
+
+  limit = parseInt(req.query.limit);
+  const skip = limit * (page - 1);
+
+  try {
+    const doctors = {};
+    doctors.doctors = await Doctor.find()
+      .sort({})
+      .page(page)
+      .limit(limit)
+      .skip(skip)
+      .exec();
+    console.log(doctors);
+    if (!doctors) {
+      res.status(400).json({
+        sucess: false,
+        message: "invalid request",
+        result: doctors,
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "request completed",
+        result: doctors,
+        page,
+        limit,
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      success: false,
+      message: "something went wrong",
+    });
+  }
+};
+
 //geta single doctor using id
 const getDoctorById = async (req, res) => {
   try {
@@ -90,7 +138,6 @@ const getDoctorById = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     res.status(400).json({
       success: false,
       message: "something went wrong",
@@ -102,7 +149,7 @@ const getDoctorById = async (req, res) => {
 const updateDoctorById = async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id);
-    console.log(doctor);
+
     if (!doctor) {
       return res.status(400).json({
         success: false,
@@ -121,7 +168,6 @@ const updateDoctorById = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     res.status(400).json({
       success: false,
       message: "something went wrong",
@@ -129,4 +175,10 @@ const updateDoctorById = async (req, res) => {
   }
 };
 
-module.exports = { createDoctor, getDoctors, getDoctorById, updateDoctorById };
+module.exports = {
+  createDoctor,
+  getDoctors,
+  getDoctorById,
+  updateDoctorById,
+  paginateDoctors,
+};
