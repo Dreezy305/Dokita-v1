@@ -14,6 +14,7 @@ function signUp(req, res) {
     firstName,
     lastName,
     sex,
+    date_of_birth,
     city,
     country,
     phoneNumber,
@@ -35,6 +36,10 @@ function signUp(req, res) {
   if (!sex) {
     errors.push({ sex: "please provide your gender" });
   }
+
+  //if (!date_of_birth) {
+  //  errors.push({ date_of_birth: "please provide your date of birth" });
+  //}
 
   if (!city) {
     errors.push({ city: "please provide your city" });
@@ -83,6 +88,7 @@ function signUp(req, res) {
         firstName: firstName,
         lastName: lastName,
         sex: sex,
+        //date_of_birt: date_of_birth,
         city: city,
         country: country,
         phoneNumber: phoneNumber,

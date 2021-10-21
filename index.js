@@ -23,7 +23,7 @@ mongoose
   })
   .then(() => console.log("connected to Dokita"))
   .catch((err) => {
-    console.log(`there was an error ${err}`);
+    console.log(err);
   });
 
 //const connection = mongoose.connection;
