@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const auth = require("./routes/auth");
+const doctors = require("./routes/doctor");
 
 require("dotenv").config();
 
@@ -31,8 +32,9 @@ mongoose
 //  console.log("MongoDB database connection established successfully");
 //});
 
-//base URL (authentication)
+//base URL
 app.use("/dokita/api/v1", auth);
+app.use("/dokita/api/v1", doctors);
 
 app.listen(port, () => {
   console.log(`listening on ${port}`);
