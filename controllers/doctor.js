@@ -195,6 +195,9 @@ const deleteDoctorById = async (req, res) => {
   }
 };
 
+//query doctors based on params such as name, department, role etc.
+const searchDoctors = () => {};
+
 module.exports = {
   createDoctor,
   getDoctors,
