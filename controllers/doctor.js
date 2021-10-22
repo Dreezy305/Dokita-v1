@@ -81,6 +81,13 @@ const paginateDoctors = async (req, res, next) => {
   const skipIndex = (page - 1) * limit;
   const results = {};
 
+  if (page < 0 || page === 0) {
+    res.status(400).json({
+      success: false,
+      message: `invalid page number ${page}`,
+    });
+  }
+
   try {
     results.results = await Doctor.find()
       .sort({ id: 1 })
@@ -95,10 +102,12 @@ const paginateDoctors = async (req, res, next) => {
         message: "not found",
       });
     } else {
+      const count = await Doctor.find();
       res.status(200).json({
         success: true,
         message: "successful operation",
         payload: doctors,
+        total: count.length,
         page: page,
         limit: limit,
       });
