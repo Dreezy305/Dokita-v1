@@ -74,9 +74,10 @@ const getDoctors = async (req, res) => {
 };
 
 //get paginated doctors from end point
-const paginateDoctors = async (req, res) => {
-  let { page, limit } = req.query;
-  page = parseInt(req.query.page);
+const paginateDoctors = (req, res) => {
+  //let { page, limit } = req.query;
+  console.log("work");
+  const page = parseInt(req.query.page);
 
   if (page < 0 || page == 0) {
     res.status(400).json({
@@ -85,33 +86,31 @@ const paginateDoctors = async (req, res) => {
     });
   }
 
-  limit = parseInt(req.query.limit);
-  const skip = limit * (page - 1);
+  const size = parseInt(req.query.size);
+  //const skip = limit * (page - 1);
+  const query = {};
+  query.skip = (page - 1) * size;
+  query.limit = size;
+  console.log(page, size, query);
 
   try {
-    const doctors = {};
-    doctors.doctors = await Doctor.find()
-      .sort({})
-      .page(page)
-      .limit(limit)
-      .skip(skip)
-      .exec();
-    console.log(doctors);
-    if (!doctors) {
-      res.status(400).json({
-        sucess: false,
-        message: "invalid request",
-        result: doctors,
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "request completed",
-        result: doctors,
-        page,
-        limit,
-      });
-    }
+    Doctor.find({}, {}, query, (err, data) => {
+      if (err) {
+        //throw err;
+        res.status(400).json({
+          sucess: false,
+          message: "invalid request",
+        });
+      } else if (data) {
+        res.status(200).json({
+          success: true,
+          message: "request completed",
+          result: [{ doctors: data }],
+          page,
+          size,
+        });
+      }
+    });
   } catch (err) {
     console.log(err);
     res.status(400).json({
@@ -182,3 +181,26 @@ module.exports = {
   updateDoctorById,
   paginateDoctors,
 };
+
+/**
+ * .page(page)
+      .limit(limit)
+      .skip(skip)
+      .exec();
+    console.log(doctors);
+    if (!doctors) {
+      res.status(400).json({
+        sucess: false,
+        message: "invalid request",
+        result: doctors,
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "request completed",
+        result: doctors,
+        page,
+        limit,
+      });
+    }
+ */
