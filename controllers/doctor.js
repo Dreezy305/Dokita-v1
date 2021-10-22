@@ -60,6 +60,7 @@ function createDoctor(req, res) {
 // get all doctors from end point
 const getDoctors = async (req, res) => {
   const doctors = await Doctor.find();
+
   if (doctors) {
     res.status(200).json({
       success: true,
@@ -74,55 +75,38 @@ const getDoctors = async (req, res) => {
 };
 
 //get paginated doctors from end point
-const paginateDoctors = (req, res) => {
-  //let { page, limit } = req.query;
-  console.log("work");
+const paginateDoctors = async (req, res, next) => {
   const page = parseInt(req.query.page);
-
-  if (page < 0) {
-    res.status(400).json({
-      success: false,
-      message: `invalid page number ${page}`,
-    });
-  }
-
   const limit = parseInt(req.query.limit);
-  const skip = limit * (page - 1);
-  const query = {};
-  //query.skip = (page - 1) * size;
-  //query.limit = size;
-  console.log(req.query, "qq");
-  console.log(page, "page");
-  console.log(limit, "limit");
-  console.log(skip, "skip");
-  console.log(query, "query");
-  //console.log(query.limit, "query.limit");
-  //console.log(query.skip, "query.skip");
+  const skipIndex = (page - 1) * limit;
+  const results = {};
 
   try {
-    const doc = Doctor.find({}, {}, query, (err, data) => {
-      if (err) {
-        //throw err;
-        res.status(400).json({
-          sucess: false,
-          message: "invalid request",
-        });
-      } else if (data) {
-        res.status(200).json({
-          success: true,
-          message: "request completed",
-          result: [{ doctors: data }],
-          page,
-          limit,
-        });
-      }
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(400).json({
-      success: false,
-      message: "something went wrong",
-    });
+    results.results = await Doctor.find()
+      .sort({ id: 1 })
+      .limit(limit)
+      .skip(skipIndex)
+      .exec();
+    res.paginatedResults = results;
+    const doctors = res.paginatedResults;
+    if (!doctors) {
+      res.status(400).json({
+        success: false,
+        message: "not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "successful operation",
+        payload: doctors,
+        page: page,
+        limit: limit,
+      });
+    }
+    next();
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ success: false, message: "something went wrong" });
   }
 };
 
@@ -187,26 +171,3 @@ module.exports = {
   updateDoctorById,
   paginateDoctors,
 };
-
-/**
- * .page(page)
-      .limit(limit)
-      .skip(skip)
-      .exec();
-    console.log(doctors);
-    if (!doctors) {
-      res.status(400).json({
-        sucess: false,
-        message: "invalid request",
-        result: doctors,
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "request completed",
-        result: doctors,
-        page,
-        limit,
-      });
-    }
- */
