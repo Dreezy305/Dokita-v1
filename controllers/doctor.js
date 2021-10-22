@@ -79,22 +79,28 @@ const paginateDoctors = (req, res) => {
   console.log("work");
   const page = parseInt(req.query.page);
 
-  if (page < 0 || page == 0) {
+  if (page < 0) {
     res.status(400).json({
       success: false,
       message: `invalid page number ${page}`,
     });
   }
 
-  const size = parseInt(req.query.size);
-  //const skip = limit * (page - 1);
+  const limit = parseInt(req.query.limit);
+  const skip = limit * (page - 1);
   const query = {};
-  query.skip = (page - 1) * size;
-  query.limit = size;
-  console.log(page, size, query);
+  //query.skip = (page - 1) * size;
+  //query.limit = size;
+  console.log(req.query, "qq");
+  console.log(page, "page");
+  console.log(limit, "limit");
+  console.log(skip, "skip");
+  console.log(query, "query");
+  //console.log(query.limit, "query.limit");
+  //console.log(query.skip, "query.skip");
 
   try {
-    Doctor.find({}, {}, query, (err, data) => {
+    const doc = Doctor.find({}, {}, query, (err, data) => {
       if (err) {
         //throw err;
         res.status(400).json({
@@ -107,7 +113,7 @@ const paginateDoctors = (req, res) => {
           message: "request completed",
           result: [{ doctors: data }],
           page,
-          size,
+          limit,
         });
       }
     });
