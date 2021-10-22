@@ -173,10 +173,41 @@ const updateDoctorById = async (req, res) => {
   }
 };
 
+// delete a doctor from record using id
+const deleteDoctorById = async (req, res) => {
+  try {
+    const doctor = await Doctor.findByIdAndDelete(
+      req.params.id,
+      (err, data) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json({
+            success: false,
+            message: "invalid parameter",
+          });
+        } else {
+          res.status(200).json({
+            success: true,
+            message: "successful operation",
+            payload: data,
+          });
+        }
+      }
+    );
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({
+      success: false,
+      message: "something went wrong",
+    });
+  }
+};
+
 module.exports = {
   createDoctor,
   getDoctors,
   getDoctorById,
   updateDoctorById,
   paginateDoctors,
+  deleteDoctorById,
 };
