@@ -16,8 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 //connect to db
-const uri =
-  "mongodb+srv://dreezy305:Olamide440@cluster0.xd7di.mongodb.net/Dokita?retryWrites=true&w=majority";
+const uri = process.env.DATABASE_URL;
 
 mongoose
   .connect(uri, {
