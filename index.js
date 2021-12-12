@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const auth = require("./routes/auth");
 const doctors = require("./routes/doctor");
+const webhook = require("./routes/webhook");
 
 require("dotenv").config();
 
@@ -15,7 +16,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 //connect to db
-const uri = process.env.DATABASE_URL;
+const uri =
+  "mongodb+srv://dreezy305:Olamide440@cluster0.xd7di.mongodb.net/Dokita?retryWrites=true&w=majority";
 
 mongoose
   .connect(uri, {
@@ -35,6 +37,7 @@ mongoose
 //base URL
 app.use("/dokita/api/v1", auth);
 app.use("/dokita/api/v1", doctors);
+app.use("/dokita/api/v1", webhook);
 
 app.listen(port, () => {
   console.log(`listening on ${port}`);
